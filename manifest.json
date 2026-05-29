@@ -1,0 +1,16 @@
+{
+  "short_name": "CocoVerde",
+  "name": "Coco Verde Express",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/1005/1005365.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#0A0D14",
+  "theme_color": "#111622",
+  "display": "standalone",
+  "orientation": "portrait"
+}
