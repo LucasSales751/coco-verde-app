@@ -18,6 +18,15 @@ DIAS_SEMANA = {
     "Thursday": "Quinta-feira", "Friday": "Sexta-feira", "Saturday": "Sábado", "Sunday": "Domingo"
 }
 
+# INJEÇÃO DE METATAGS PARA FORÇAR O MODO APP (TELA CHEIA) NO IPHONE E ANDROID
+st.markdown("""
+    <head>
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="mobile-web-app-capable" content="yes">
+    </head>
+""", unsafe_allow_html=True)
+
 # Injeção de CSS - Modo Escuro Tecnológico Unificado (Sem Topo Branco)
 st.markdown("""
     <style>
@@ -158,9 +167,8 @@ PRODUTOS = {
 if 'estoque' not in st.session_state:
     st.session_state.estoque = 29  
 if 'custo_unitario' not in st.session_state:
-    st.session_state.custo_unitario = 2.40  # Média de R$ 2,30 a R$ 2,50 por fruto de revenda
+    st.session_state.custo_unitario = 2.40  
 if 'vendas' not in st.session_state:
-    # Registros ajustados para bater perfeitamente o cardápio real (Total R$ 10,00)
     st.session_state.vendas = [
         {
             "id": 1, 
