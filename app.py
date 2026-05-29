@@ -100,7 +100,7 @@ st.markdown("""
         color: #00E676 !important; /* Verde Cyberpunk */
     }
     .stMarkdown p, th, td {
-        color: #E2E8F0 !important; /* Texto claro de leitura confortável */
+        color: #E2E8F0 !important; # Texto claro de leitura confortável
     }
     
     /* 5. CARDS DE MÉTRICAS OPERACIONAIS */
@@ -261,7 +261,7 @@ elif area_selecionada == "📦 Gerenciar Estoque":
         st.caption("Ação crítica para sincronizar a contagem após auditoria de balanço.")
         if st.button("Zerar Contagem Manual"):
             st.session_state.estoque = 0
-            st.warning("Estoque ajustado para zero.")
+            st.warning("Estoque adjusted para zero.")
             st.rerun()
 
 # ==========================================
@@ -276,7 +276,8 @@ elif area_selecionada == "💸 Realizar Venda":
     else:
         col_v1, col_v2 = st.columns(2)
         with col_v1:
-            atendente = st.selectbox("Quem está atendendo?", ["Mariana", "Carlos", "Juliana"])
+            # ALTERAÇÃO AQUI: Em vez de caixa de seleção fixa, agora é um campo de texto livre!
+            atendente = st.text_input("Nome do Atendente:", placeholder="Digite quem está vendendo...").strip()
             produto_sel = st.selectbox("Selecione o Item:", list(PRODUTOS.keys()))
         with col_v2:
             cocos_necessarios = PRODUTOS[produto_sel]["cocos"]
@@ -295,7 +296,14 @@ elif area_selecionada == "💸 Realizar Venda":
             
             st.markdown(f"### Total do Pedido: <span style='color:#00E676;'>**R$ {valor_final:.2f}**</span>", unsafe_allow_html=True)
             
-            if st.button("Confirmar e Registrar"):
+            # Bloqueia a confirmação se o nome do atendente estiver em branco
+            if not atendente:
+                st.warning("Por favor, digite o nome do atendente antes de confirmar.")
+                botao_desabilitado = True
+            else:
+                botao_desabilitado = False
+                
+            if st.button("Confirmar e Registrar", disabled=botao_desabilitado):
                 fuso_br = timezone(timedelta(hours=-3))
                 momento_atual = datetime.now(fuso_br)
                 
@@ -310,7 +318,7 @@ elif area_selecionada == "💸 Realizar Venda":
                     "id": novo_id,
                     "data_hora": data_hora_texto,
                     "dia_semana": dia_pt,
-                    "atendente": atendente,
+                    "atendente": atendente, # Salva o nome digitado livremente
                     "produto": produto_sel,
                     "qtd_cocos": qtd_venda * cocos_necessarios,
                     "total": valor_final,
