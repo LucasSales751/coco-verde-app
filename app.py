@@ -29,10 +29,9 @@ st.markdown("""
     </head>
 """, unsafe_allow_html=True)
 
-# Injeção de CSS - Modo Escuro Tecnológico Unificado (Sem Topo Branco)
+# Injeção de CSS - Modo Escuro Tecnológico Unificado
 st.markdown("""
     <style>
-    /* CORREÇÃO DO TEXTO FANTASMA DO BOTÃO NATIVO */
     button[data-testid="sidebar-toggle"] span {
         display: none !important;
     }
@@ -42,7 +41,6 @@ st.markdown("""
         color: #00E676 !important;
     }
 
-    /* REMOVE A FAIXA BRANCA DO TOPO - CORREÇÃO COMPLETA DE HEADER */
     header[data-testid="stHeader"], 
     .stHeader, 
     [data-testid="stHeader"] {
@@ -51,25 +49,21 @@ st.markdown("""
         border-bottom: 1px solid #1E293B !important;
     }
     
-    /* Linha decorativa verde neon discreta no topo */
     div[data-testid="stDecoration"] {
         background-image: none !important;
         background-color: #00E676 !important;
         height: 3px !important;
     }
 
-    /* 1. ESTILIZAÇÃO DO FUNDO DA APLICAÇÃO (DARK UNIFICADO) */
     .stApp {
         background-color: #0A0D14 !important;
     }
     
-    /* 2. SIDEBAR LATERAL (GRAFITE ESCURO PREMIUM) */
     section[data-testid="stSidebar"] {
         background-color: #111622 !important;
         border-right: 1px solid #1E293B !important;
     }
     
-    /* Forçar textos da barra lateral para Branco e Verde */
     section[data-testid="stSidebar"] h1, 
     section[data-testid="stSidebar"] h2, 
     section[data-testid="stSidebar"] h3, 
@@ -79,7 +73,6 @@ st.markdown("""
         color: #FFFFFF !important;
     }
 
-    /* 3. BLOCO CENTRAL (CARD ESTILO PAINEL DE CONTROLE) */
     .main .block-container {
         background-color: #111622 !important;
         padding: 35px 45px !important;
@@ -89,7 +82,6 @@ st.markdown("""
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3) !important;
     }
     
-    /* 4. TÍTULOS E TEXTOS DO PAINEL CENTRAL */
     h1 {
         color: #FFFFFF !important;
         font-weight: 700 !important;
@@ -99,13 +91,12 @@ st.markdown("""
         margin-bottom: 20px !important;
     }
     h2, h3, label {
-        color: #00E676 !important; /* Verde Cyberpunk */
+        color: #00E676 !important;
     }
     .stMarkdown p, th, td {
         color: #E2E8F0 !important;
     }
     
-    /* 5. CARDS DE MÉTRICAS OPERACIONAIS */
     [data-testid="stMetric"] {
         background-color: #1A202C !important;
         padding: 20px !important;
@@ -124,14 +115,12 @@ st.markdown("""
         text-transform: uppercase;
     }
 
-    /* 6. INPUTS E SELETORES EM MODO DARK */
     div[data-baseweb="select"], div[data-baseweb="input"], input {
         background-color: #1A202C !important;
         color: #FFFFFF !important;
         border: 1px solid #2D3748 !important;
     }
 
-    /* 7. BOTÕES OPERACIONAIS GLOW */
     .stButton>button {
         background-color: #00E676 !important;
         color: #0A0D14 !important;
@@ -148,7 +137,6 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(0, 178, 72, 0.4) !important;
     }
     
-    /* Customização das Tabelas / Dataframes */
     .stDataFrame {
         background-color: #1A202C !important;
         border-radius: 6px;
@@ -171,11 +159,13 @@ if 'estoque' not in st.session_state:
 if 'custo_unitario' not in st.session_state:
     st.session_state.custo_unitario = 2.40  
 if 'vendas' not in st.session_state:
+    # Registros iniciais com identificação de semana (ex: Semana 22 de 2026)
     st.session_state.vendas = [
         {
             "id": 1, 
             "data_hora": "29/05/2026 09:30", 
             "dia_semana": "Sexta-feira", 
+            "semana_ano": "Semana 22 (2026)",
             "atendente": "Mariana", 
             "produto": "🍼 Garrafa de 500ml", 
             "qtd_cocos": 2, 
@@ -186,6 +176,7 @@ if 'vendas' not in st.session_state:
             "id": 2, 
             "data_hora": "29/05/2026 10:15", 
             "dia_semana": "Sexta-feira", 
+            "semana_ano": "Semana 22 (2026)",
             "atendente": "Carlos", 
             "produto": "🥥 Coco Normal no Canudo", 
             "qtd_cocos": 1, 
@@ -215,31 +206,48 @@ st.sidebar.markdown(f"🔋 **Estoque Operacional:** `{st.session_state.estoque} 
 # ==========================================
 if area_selecionada == "📊 Painel Geral":
     st.markdown("# 📊 Painel Geral de Desempenho")
-    st.markdown("Métricas consolidadas de faturamento, vendas e fluxo.")
     
-    faturamento = sum(v["total"] for v in st.session_state.vendas)
-    total_pedidos = len(st.session_state.vendas)
+    # Criar filtro seletor de semanas dinâmico
+    if st.session_state.vendas:
+        semanas_disponiveis = sorted(list(set(v["semana_ano"] for v in st.session_state.vendas)), reverse=True)
+        semanas_disponiveis.insert(0, "Todas as Semanas")
+        semana_selecionada = st.selectbox("📅 Filtrar Visualização por Período / Semana:", semanas_disponiveis)
+        
+        # Filtrar a lista de vendas baseada na escolha
+        if semana_selecionada == "Todas as Semanas":
+            vendas_filtradas = st.session_state.vendas
+        else:
+            vendas_filtradas = [v for v in st.session_state.vendas if v["semana_ano"] == semana_selecionada]
+    else:
+        vendas_filtradas = []
+        st.info("Nenhuma movimentação lançada.")
+
+    st.markdown("---")
+    
+    faturamento = sum(v["total"] for v in vendas_filtradas)
+    total_pedidos = len(vendas_filtradas)
+    lucro_total = sum(v["lucro"] for v in vendas_filtradas)
     
     col1, col2, col3 = st.columns(3)
     with col1:
         st.metric(label="💰 Faturamento Bruto", value=f"R$ {faturamento:.2f}")
     with col2:
-        st.metric(label="🤝 Pedidos Concluídos", value=f"{total_pedidos} vendas")
+        st.metric(label="📈 Lucro Líquido Estimado", value=f"R$ {lucro_total:.2f}")
     with col3:
-        st.metric(label="📦 Saldo em Depósito", value=f"{st.session_state.estoque} un")
+        st.metric(label="🤝 Pedidos no Período", value=f"{total_pedidos} vendas")
         
     st.markdown("---")
-    st.markdown("### 🏆 Rendimento por Atendente")
+    st.markdown("### 🏆 Rendimento por Atendente no Período Filtrado")
     
     ranking = {}
-    for v in st.session_state.vendas:
+    for v in vendas_filtradas:
         ranking[v["atendente"]] = ranking.get(v["atendente"], 0) + v["total"]
         
     if ranking:
         df_ranking = pd.DataFrame(list(ranking.items()), columns=["Atendente", "Faturamento Total (R$)"]).sort_values(by="Faturamento Total (R$)", ascending=False)
         st.dataframe(df_ranking, use_container_width=True, hide_index=True)
     else:
-        st.info("Nenhuma movimentação lançada.")
+        st.caption("Sem dados para exibir o ranking nesta semana.")
 
 # ==========================================
 # MÓDULO 2: 📦 GERENCIAR ESTOQUE
@@ -311,6 +319,11 @@ elif area_selecionada == "💸 Realizar Venda":
                 dia_nome_en = momento_atual.strftime("%A")
                 dia_pt = DIAS_SEMANA.get(dia_nome_en, dia_nome_en)
                 
+                # Cálculo Automático da Semana Fiscal/Calendário
+                num_semana = momento_atual.strftime("%U")
+                ano_atual = momento_atual.strftime("%Y")
+                texto_semana = f"Semana {num_semana} ({ano_atual})"
+                
                 st.session_state.estoque -= (qtd_venda * cocos_necessarios)
                 novo_id = max([v["id"] for v in st.session_state.vendas]) + 1 if st.session_state.vendas else 1
                 
@@ -318,6 +331,7 @@ elif area_selecionada == "💸 Realizar Venda":
                     "id": novo_id,
                     "data_hora": data_hora_texto,
                     "dia_semana": dia_pt,
+                    "semana_ano": texto_semana, # Organiza a venda na semana corrente
                     "atendente": atendente,
                     "produto": produto_sel,
                     "qtd_cocos": qtd_venda * cocos_necessarios,
@@ -342,8 +356,8 @@ elif area_selecionada == "📜 Histórico de Vendas":
         
         with col_tabela:
             df_historico = pd.DataFrame(st.session_state.vendas)
-            df_historico = df_historico[["id", "data_hora", "dia_semana", "atendente", "produto", "qtd_cocos", "total"]]
-            df_historico.columns = ["ID", "Data/Hora", "Dia da Semana", "Atendente", "Produto", "Cocos Usados", "Valor Total (R$)"]
+            df_historico = df_historico[["id", "data_hora", "semana_ano", "atendente", "produto", "qtd_cocos", "total"]]
+            df_historico.columns = ["ID", "Data/Hora", "Semana Operacional", "Atendente", "Produto", "Cocos Usados", "Valor Total (R$)"]
             
             st.dataframe(df_historico.sort_values(by="ID", ascending=False), use_container_width=True, hide_index=True)
             
