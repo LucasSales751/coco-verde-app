@@ -18,12 +18,14 @@ DIAS_SEMANA = {
     "Thursday": "Quinta-feira", "Friday": "Sexta-feira", "Saturday": "Sábado", "Sunday": "Domingo"
 }
 
-# INJEÇÃO DE METATAGS PARA FORÇAR O MODO APP (TELA CHEIA) NO IPHONE E ANDROID
+# INJEÇÃO DO MANIFESTO E METATAGS DE TELA CHEIA (ESTILO APLICATIVO IOS/ANDROID)
 st.markdown("""
     <head>
+        <link rel="manifest" href="manifest.json">
         <meta name="apple-mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
         <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-title" content="Coco Verde">
     </head>
 """, unsafe_allow_html=True)
 
@@ -100,7 +102,7 @@ st.markdown("""
         color: #00E676 !important; /* Verde Cyberpunk */
     }
     .stMarkdown p, th, td {
-        color: #E2E8F0 !important; # Texto claro de leitura confortável
+        color: #E2E8F0 !important;
     }
     
     /* 5. CARDS DE MÉTRICAS OPERACIONAIS */
@@ -111,7 +113,7 @@ st.markdown("""
         border: 1px solid #2D3748 !important;
     }
     [data-testid="stMetricValue"] {
-        color: #00E676 !important; /* Destaque verde neon nos números */
+        color: #00E676 !important;
         font-weight: 700 !important;
         font-size: 2.2rem !important;
         text-shadow: 0 0 10px rgba(0, 230, 118, 0.2);
@@ -276,7 +278,6 @@ elif area_selecionada == "💸 Realizar Venda":
     else:
         col_v1, col_v2 = st.columns(2)
         with col_v1:
-            # ALTERAÇÃO AQUI: Em vez de caixa de seleção fixa, agora é um campo de texto livre!
             atendente = st.text_input("Nome do Atendente:", placeholder="Digite quem está vendendo...").strip()
             produto_sel = st.selectbox("Selecione o Item:", list(PRODUTOS.keys()))
         with col_v2:
@@ -296,7 +297,6 @@ elif area_selecionada == "💸 Realizar Venda":
             
             st.markdown(f"### Total do Pedido: <span style='color:#00E676;'>**R$ {valor_final:.2f}**</span>", unsafe_allow_html=True)
             
-            # Bloqueia a confirmação se o nome do atendente estiver em branco
             if not atendente:
                 st.warning("Por favor, digite o nome do atendente antes de confirmar.")
                 botao_desabilitado = True
@@ -318,7 +318,7 @@ elif area_selecionada == "💸 Realizar Venda":
                     "id": novo_id,
                     "data_hora": data_hora_texto,
                     "dia_semana": dia_pt,
-                    "atendente": atendente, # Salva o nome digitado livremente
+                    "atendente": atendente,
                     "produto": produto_sel,
                     "qtd_cocos": qtd_venda * cocos_necessarios,
                     "total": valor_final,
